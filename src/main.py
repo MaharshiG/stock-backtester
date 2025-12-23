@@ -5,6 +5,8 @@ from src.data_loader import load_prices
 from src.indicators import sma, daily_returns
 from src.strategies import ma_crossover_signals
 from src.metrics import total_return, max_drawdown, sharpe_ratio_from_equity
+from src.plotting import plot_price_with_signals, plot_equity_curve
+
 
 
 
@@ -54,6 +56,12 @@ def main():
             f"Return={rets[i]:.4f} | Signal={signals[i]} | "
             f"Shares={shares_curve[i]} | Equity={equity_curve[i]:.2f}"
         )
+    fast_w, slow_w = 2, 3
+    signals = ma_crossover_signals(close, fast_window=fast_w, slow_window=slow_w)
+
+    fast_sma = sma(close, window=fast_w)
+    slow_sma = sma(close, window=slow_w)
+
     # Metrics (Milestone 5)
     tr = total_return(equity_curve)
     mdd = max_drawdown(equity_curve)
@@ -64,6 +72,24 @@ def main():
     print(f"Max drawdown: {mdd * 100:.2f}%")
     print(f"Sharpe ratio: {sr:.2f}")
 
+    outputs_dir = project_root / "outputs"
+    plot_price_with_signals(
+        dates=dates,
+        close=close,
+        fast_sma=fast_sma,
+        slow_sma=slow_sma,
+        signals=signals,
+        output_path=outputs_dir / "price_signals.png",
+    )
+
+    plot_equity_curve(
+        dates=dates,
+        equity=equity_curve,
+        output_path=outputs_dir / "equity_curve.png",
+    )
+
+    print("\nSaved plots to:")
+    print(outputs_dir)
 
 
 if __name__ == "__main__":
