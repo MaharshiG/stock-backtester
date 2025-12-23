@@ -6,6 +6,8 @@ from src.indicators import sma, daily_returns
 from src.strategies import ma_crossover_signals
 from src.metrics import total_return, max_drawdown, sharpe_ratio_from_equity
 from src.plotting import plot_price_with_signals, plot_equity_curve
+from src.indicators import rsi
+from src.strategies import rsi_strategy_signals
 
 
 
@@ -13,6 +15,7 @@ from src.plotting import plot_price_with_signals, plot_equity_curve
 def main():
     project_root = Path(__file__).resolve().parents[1]
     csv_path = project_root / "data" / "sample_prices.csv"
+
 
     dates, close = load_prices(csv_path)
 
@@ -30,6 +33,7 @@ def main():
         signals=signals,
         initial_cash=10_000.0,
     )
+    strategy = "rsi"  # change to "ma" to use moving average crossover
 
     print("Hello Backtester")
     print(f"Loaded rows: {len(close)}")
