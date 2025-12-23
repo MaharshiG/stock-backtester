@@ -1,4 +1,6 @@
 import numpy as np
+from src.indicators import rsi
+
 
 
 def ma_crossover_signals(
@@ -52,3 +54,39 @@ def ma_crossover_signals(
     signals[cross_down] = -1
 
     return signals
+def rsi_strategy_signals(
+    prices: np.ndarray,
+    period: int = 14,
+    buy_below: float = 30.0,
+    sell_above: float = 70.0,
+) -> np.ndarray:
+    """
+    RSI threshold strategy.
+
+    BUY  when RSI crosses below buy_below (oversold) -> then later crosses above buy_below? (simple version below)
+    SELL when RSI crosses above sell_above (overbought)
+
+    Signals:
+      +1 buy
+      -1 sell
+       0 hold
+    """
+    prices = prices.astype(float)
+    r = rsi(prices, period=period)
+
+    signals = np.zeros_like(prices, dtype=int)
+
+    # We'll generate signals when RSI enters zones:
+    # buy signal: RSI < buy_below
+    # sell signal: RSI > sell_above
+    buy_idx = np.where(r < buy_below)[0]
+    sell_idx = np.where(r > sell_above)[0]
+
+    signals[buy_idx] = 1
+    signals[sell_idx] = -1
+
+    # Prevent impossible early signals where RSI is NaN
+    signals[np.isnan(r)] = 0
+
+    return signals
+
