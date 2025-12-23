@@ -4,6 +4,8 @@ from src.backtester import run_backtest
 from src.data_loader import load_prices
 from src.indicators import sma, daily_returns
 from src.strategies import ma_crossover_signals
+from src.metrics import total_return, max_drawdown, sharpe_ratio_from_equity
+
 
 
 def main():
@@ -52,6 +54,16 @@ def main():
             f"Return={rets[i]:.4f} | Signal={signals[i]} | "
             f"Shares={shares_curve[i]} | Equity={equity_curve[i]:.2f}"
         )
+    # Metrics (Milestone 5)
+    tr = total_return(equity_curve)
+    mdd = max_drawdown(equity_curve)
+    sr = sharpe_ratio_from_equity(equity_curve)
+
+    print("\nMetrics summary:")
+    print(f"Total return: {tr * 100:.2f}%")
+    print(f"Max drawdown: {mdd * 100:.2f}%")
+    print(f"Sharpe ratio: {sr:.2f}")
+
 
 
 if __name__ == "__main__":
