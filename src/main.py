@@ -3,7 +3,9 @@ from src.data_loader import load_prices
 
 
 def main():
-    csv_path = Path("data") / "sample_prices.csv"
+    project_root = Path(__file__).resolve().parents[1]
+    csv_path = project_root / "data" / "sample_prices.csv"
+
     dates, close = load_prices(csv_path)
 
     print("Hello Backtester")
