@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from src.backtester import run_backtest
 from src.data_loader import load_prices
 from src.indicators import sma, daily_returns
 from src.strategies import ma_crossover_signals
@@ -18,8 +19,13 @@ def main():
     # Strategy (Milestone 3)
     signals = ma_crossover_signals(close, fast_window=2, slow_window=3)
 
-    buy_count = int((signals == 1).sum())
-    sell_count = int((signals == -1).sum())
+    # Backtest (Milestone 4)
+    cash_curve, shares_curve, equity_curve, trades = run_backtest(
+        dates=dates,
+        close=close,
+        signals=signals,
+        initial_cash=10_000.0,
+    )
 
     print("Hello Backtester")
     print(f"Loaded rows: {len(close)}")
@@ -27,14 +33,24 @@ def main():
     print(f"Close min/max: {close.min():.2f} / {close.max():.2f}")
 
     print("\nSignals summary:")
-    print(f"BUY signals:  {buy_count}")
-    print(f"SELL signals: {sell_count}")
+    print(f"BUY signals:  {(signals == 1).sum()}")
+    print(f"SELL signals: {(signals == -1).sum()}")
+
+    print("\nBacktest summary:")
+    print(f"Final equity: {equity_curve[-1]:.2f}")
+    print(f"Trades: {len(trades)}")
+
+    if trades:
+        print("\nTrades:")
+        for t in trades:
+            print(f"{t.date} {t.side} price={t.price:.2f} shares={t.shares} cash_after={t.cash_after:.2f}")
 
     print("\nPreview (all rows):")
     for i in range(len(close)):
         print(
-            f"{dates[i]} | Close={close[i]:.2f} | "
-            f"SMA(3)={sma_3[i]:.2f} | Return={rets[i]:.4f} | Signal={signals[i]}"
+            f"{dates[i]} | Close={close[i]:.2f} | SMA(3)={sma_3[i]:.2f} | "
+            f"Return={rets[i]:.4f} | Signal={signals[i]} | "
+            f"Shares={shares_curve[i]} | Equity={equity_curve[i]:.2f}"
         )
 
 
